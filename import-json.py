@@ -1,75 +1,18 @@
 #!/usr/bin/env python3
 
 import json
-import csv
-import hashlib
-import getpass
 import argparse
 import sys
 
 import requests
 import progress.bar
-import simplejson
 
-
-def print_err( *args, **kwargs ):
-    print( *args, file=sys.stderr, **kwargs )
-
-
-def pretty_json( ugly ):
-    return json.dumps( ugly, indent=4, sort_keys=False )
-
-
-def verify_response( r, data=None ):
-    if not (200 <= r.status_code < 300):
-        print_err( '$ ' + r.request.method + ' ' + r.request.url )
-        if data is not None:
-            print_err( '\n'.join( [f'> {line}' for line in pretty_json( data ).split( '\n' )] ) )
-        try:
-            js = r.json()
-            if 'message' in js:
-                print_err( str( r.status_code ) + ' ' + js['message'] )
-            else:
-                print_err( str( r.status_code ) + ':\n' + pretty_json( js ) )
-        except simplejson.errors.JSONDecodeError:
-            print_err( str( r.status_code ) + ':\n' + r.text )
-        sys.exit( 1 )
-
-
-def build_auth_header( token ):
-    return {'Authorization': f'Bearer {token}'}
-
-
-def login( url, email, username, password ):
-    if password is None:
-        password = getpass.getpass()
-    data = {
-        **({'email': email} if email is not None else {'username': username}),
-        'password': hashlib.sha512( password.encode( 'utf-8' ) ).hexdigest()
-    }
-
-    print( 'Authenticating...' )
-    try:
-        r = requests.post( f'{url}/auth/login', json=data )
-    except requests.exceptions.ConnectionError:
-        print_err( 'Server is down.' )
-        sys.exit( 1 )
-    except requests.exceptions.InvalidSchema:
-        print_err( 'Invalid schema in URL, try `https://` or `http://`.' )
-        sys.exit( 1 )
-    verify_response( r, data )
-    access_token = r.json()['data']['access_token']
-    refresh_token = r.json()['data']['refresh_token']
-
-    return access_token, refresh_token
-
-
-def logout( url, access_token, refresh_token ):
-    print( 'Signing out...' )
-    r = requests.delete( f'{url}/auth/revoke-access', headers=build_auth_header( access_token ) )
-    verify_response( r )
-    r = requests.delete( f'{url}/auth/revoke-refresh', headers=build_auth_header( refresh_token ) )
-    verify_response( r )
+from common.utils import verify_response
+from common.utils import print_err
+from common.utils import pretty_json
+from common.auth import login
+from common.auth import logout
+from common.auth import build_auth_header
 
 
 def simple_changeset_to_list( data ):

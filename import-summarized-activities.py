@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 
 import json
-import csv
-import hashlib
-import getpass
 import argparse
 import sys
-import os
-import collections
 import datetime
 import enum
 
 import requests
 import progress.bar
-import simplejson
+
+from common.utils import verify_response
+from common.utils import print_err
+from common.utils import string_to_date
+from common.utils import date_to_string
+from common.auth import login
+from common.auth import logout
+from common.auth import build_auth_header
 
 
 class Alignment( enum.Enum ):
@@ -23,71 +25,6 @@ class Alignment( enum.Enum ):
 
     def __str__( self ):
         return self.value
-
-
-def print_err( *args, **kwargs ):
-    print( *args, file=sys.stderr, **kwargs )
-
-
-def verify_response( r, data=None ):
-    def pretty_json( ugly ):
-        return json.dumps( ugly, indent=4, sort_keys=False )
-
-    if not (200 <= r.status_code < 300):
-        print_err( '$ ' + r.request.method + ' ' + r.request.url )
-        if data is not None:
-            print_err( '\n'.join( [f'> {line}' for line in pretty_json( data ).split( '\n' )] ) )
-        try:
-            js = r.json()
-            if 'message' in js:
-                print_err( str( r.status_code ) + ' ' + js['message'] )
-            else:
-                print_err( str( r.status_code ) + ':\n' + pretty_json( js ) )
-        except simplejson.errors.JSONDecodeError:
-            print_err( str( r.status_code ) + ':\n' + r.text )
-        sys.exit( 1 )
-
-
-def build_auth_header( token ):
-    return {'Authorization': f'Bearer {token}'}
-
-
-def date_to_string( date ):
-    return date.strftime( '%Y-%m-%dT%H:%M:%S.%f' )[:23] + 'Z'
-
-
-def string_to_date( string ):
-    return datetime.datetime.strptime( string, "%Y-%m-%dT%H:%M:%S.%fZ" )
-
-
-def login( url, email, username, password ):
-    if password is None:
-        password = getpass.getpass()
-    data = {
-        **({'email': email} if email is not None else {'username': username}),
-        'password': hashlib.sha512( password.encode( 'utf-8' ) ).hexdigest()
-    }
-
-    print( 'Authenticating...' )
-    try:
-        r = requests.post( f'{url}/auth/login', json=data )
-    except requests.exceptions.ConnectionError:
-        print_err( 'Server is down.' )
-        sys.exit( 1 )
-    verify_response( r, data )
-    access_token = r.json()['data']['access_token']
-    refresh_token = r.json()['data']['refresh_token']
-    user_id = r.json()['data']['id']
-
-    return access_token, refresh_token, user_id
-
-
-def logout( url, access_token, refresh_token ):
-    print( 'Signing out...' )
-    r = requests.delete( f'{url}/auth/revoke-access', headers=build_auth_header( access_token ) )
-    verify_response( r )
-    r = requests.delete( f'{url}/auth/revoke-refresh', headers=build_auth_header( refresh_token ) )
-    verify_response( r )
 
 
 def simple_changeset_to_list( data ):
@@ -149,8 +86,8 @@ def get_subject_descendants( data, subject_id ):
 
 
 def align_date( date: datetime.datetime, alignment: Alignment ):
-    def add_some_hours( date: datetime.date ) -> datetime.datetime:
-        return datetime.datetime.combine( date, datetime.datetime.min.time() ) + datetime.timedelta( hours=6 )
+    def add_some_hours( date_: datetime.date ) -> datetime.datetime:
+        return datetime.datetime.combine( date_, datetime.datetime.min.time() ) + datetime.timedelta( hours=6 )
 
     if alignment == Alignment.daily:
         return add_some_hours( date.date() )
