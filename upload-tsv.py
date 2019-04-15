@@ -40,7 +40,7 @@ def import_csv( url, token, reader, on_row_complete, dry_run ):
             'subject_parent_name': row[3],
             'subject_name': row[4],
             'location_name': row[2],
-            **({'data': '{"comment":"' + row[5] + '"}'} if len( row ) > 5 and row[5] != '' else {})
+            **({'data': {"comment": row[5]}} if len( row ) > 5 and row[5] != '' else {})
         }
         if not dry_run:
             r = requests.post( f'{url}/activity/', json=data, headers=build_auth_header( token ) )
