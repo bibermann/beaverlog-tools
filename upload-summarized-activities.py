@@ -72,9 +72,9 @@ def load_data( filename ):
 
 
 def get_subject_descendants( data, subject_id ):
-    # NOTE: We could use ancestor_ids as follows, but to allow simpler data structures
-    #       (i.e. manually built instead of exported), we use a slightly more complex algorithm.
-    # Using ancestor_ids:
+    # NOTE: We could use `ancestor_ids` as follows, but to allow simpler data structures
+    #       (i.e. when input was manually built instead of exported), we use a slightly more complex algorithm.
+    # Code which uses `ancestor_ids`:
     #     return set( [subject['id'] for subject in data['subjects'] if subject_id in subject['ancestor_ids']] )
 
     descendants = set()
