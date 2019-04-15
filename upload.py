@@ -213,7 +213,7 @@ def main():
         print_err( f'--whitelist and --blacklist must not have common items' )
         sys.exit( 1 )
 
-    access_token, refresh_token = login( args.api, args.e, args.u, args.p )
+    access_token, refresh_token, _ = login( args.api, args.e, args.u, args.p )
     try:
         clear_data( args.api, access_token, args.y )
         data = load_data( args.input )
