@@ -23,7 +23,7 @@ def simple_changeset_to_list( data ):
 
 
 def fetch_users( url, token ):
-    r = requests.get( f'{url}/user/', headers=build_auth_header( token ) )
+    r = requests.get( f'{url}/user/all', headers=build_auth_header( token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
