@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 
-import json
 import argparse
-import sys
 import datetime
 import enum
+import json
+import sys
 
-import requests
 import progress.bar
+import requests
 
-from common.utils import verify_response
-from common.utils import print_err
-from common.utils import string_to_date
-from common.utils import date_to_string
+from common.auth import build_auth_header
 from common.auth import login
 from common.auth import logout
-from common.auth import build_auth_header
+from common.utils import date_to_string
+from common.utils import string_to_date
+from common.utils import verify_response
+from v0.detail.parser import add_default_arguments
+from v0.detail.parser import verify_default_arguments
 
 
 class Alignment( enum.Enum ):
@@ -136,27 +137,16 @@ def import_activities( url, token, activities ):
 
 def main():
     parser = argparse.ArgumentParser( description='(Re)import summarized activities.' )
-    parser.add_argument( '--api', metavar='URL', type=str, help='default: %(default)s',
-                         default='https://time.nevees.org/api' )
-    parser.add_argument( '-e', metavar='EMAIL', type=str, help='email or username must be given' )
-    parser.add_argument( '-u', metavar='USERNAME', type=str, help='email or username must be given' )
-    parser.add_argument( '-p', metavar='PASSWORD', type=str, help='if not given you get prompted' )
+    add_default_arguments( parser, with_y=True )
     parser.add_argument( '-s', type=Alignment, choices=list( Alignment ), help='How to summarize, default: %(default)s',
                          default=Alignment.daily )
-    parser.add_argument( '-y', action='store_true', help='skip warning notice' )
     parser.add_argument( 'input', metavar='INPUT', type=str, help='source json file' )
     parser.add_argument( 'source_subject', metavar='SOURCE_SUBJECT', type=int, help='source subject id' )
     parser.add_argument( 'target_subject', metavar='TARGET_SUBJECT', type=int, help='target subject id' )
     parser.add_argument( 'target_location', metavar='TARGET_LOCATION', type=int, help='target location id' )
+
     args = parser.parse_args()
-
-    if args.e is None and args.u is None:
-        print_err( 'You must give -e or -u.' )
-        sys.exit( 1 )
-
-    if args.e is not None and args.u is not None:
-        print_err( '-e and -u are mutually exclusive.' )
-        sys.exit( 1 )
+    verify_default_arguments( args )
 
     access_token, refresh_token, user_id = login( args.api, args.e, args.u, args.p )
     try:

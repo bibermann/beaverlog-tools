@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 
-import csv
 import argparse
+import csv
 import sys
 
-import requests
 import progress.bar
+import requests
 
-from common.utils import verify_response
-from common.utils import print_err
+from common.auth import build_auth_header
 from common.auth import login
 from common.auth import logout
-from common.auth import build_auth_header
+from common.utils import verify_response
+from v0.detail.parser import add_default_arguments
+from v0.detail.parser import verify_default_arguments
 
 
 def clear_data( url, token, skip_warning ):
@@ -63,24 +64,13 @@ def import_files( url, token, filenames, dry_run ):
 
 def main():
     parser = argparse.ArgumentParser( description='(Re)import time data.' )
-    parser.add_argument( '--api', metavar='URL', type=str, help='default: %(default)s',
-                         default='https://time.nevees.org/api' )
-    parser.add_argument( '-e', metavar='EMAIL', type=str, help='email or username must be given' )
-    parser.add_argument( '-u', metavar='USERNAME', type=str, help='email or username must be given' )
-    parser.add_argument( '-p', metavar='PASSWORD', type=str, help='if not given you get prompted' )
-    parser.add_argument( '-y', action='store_true', help='skip warning notice' )
+    add_default_arguments( parser, with_y=True )
     parser.add_argument( '--append', action='store_true', help='do not clear data before importing' )
     parser.add_argument( '--dry-run', action='store_true', help='useful to check input files for errors' )
     parser.add_argument( 'input', metavar='INPUT', type=str, nargs='+', help='one or more tsv files' )
+
     args = parser.parse_args()
-
-    if args.e is None and args.u is None:
-        print_err( 'You must give -e or -u.' )
-        sys.exit( 1 )
-
-    if args.e is not None and args.u is not None:
-        print_err( '-e and -u are mutually exclusive.' )
-        sys.exit( 1 )
+    verify_default_arguments( args )
 
     if not args.dry_run:
         access_token, refresh_token, _ = login( args.api, args.e, args.u, args.p )

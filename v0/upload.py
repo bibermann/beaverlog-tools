@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 
-import json
 import argparse
+import json
 import sys
 
-import requests
 import progress.bar
+import requests
 
-from common.utils import verify_response
-from common.utils import print_err
-from common.utils import pretty_json
+from common.auth import build_auth_header
 from common.auth import login
 from common.auth import logout
-from common.auth import build_auth_header
+from common.utils import pretty_json
+from common.utils import print_err
+from common.utils import verify_response
+from v0.detail.parser import add_default_arguments
+from v0.detail.parser import verify_default_arguments
 
 
 def simple_changeset_to_list( data ):
@@ -177,25 +179,14 @@ def map_parent_ids( subjects, parent_id_map ):
 
 def main():
     parser = argparse.ArgumentParser( description='(Re)import time data.' )
-    parser.add_argument( '--api', metavar='URL', type=str, help='default: %(default)s',
-                         default='https://time.nevees.org/api' )
-    parser.add_argument( '-e', metavar='EMAIL', type=str, help='email or username must be given' )
-    parser.add_argument( '-u', metavar='USERNAME', type=str, help='email or username must be given' )
-    parser.add_argument( '-p', metavar='PASSWORD', type=str, help='if not given you get prompted' )
-    parser.add_argument( '-y', action='store_true', help='skip warning notice' )
+    add_default_arguments( parser, with_y=True )
     parser.add_argument( '--parent-id-map', metavar='JSON', type=str, help='map for organization parent ids' )
     parser.add_argument( '--whitelist', metavar='JSON', type=str, help='array with subject names to allow' )
     parser.add_argument( '--blacklist', metavar='JSON', type=str, help='array with subject names to ignore' )
     parser.add_argument( 'input', metavar='INPUT', type=str, help='source json file' )
+
     args = parser.parse_args()
-
-    if args.e is None and args.u is None:
-        print_err( 'You must give -e or -u.' )
-        sys.exit( 1 )
-
-    if args.e is not None and args.u is not None:
-        print_err( '-e and -u are mutually exclusive.' )
-        sys.exit( 1 )
+    verify_default_arguments( args )
 
     parent_id_map = {}
     if args.parent_id_map is not None:

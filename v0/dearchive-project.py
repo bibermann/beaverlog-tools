@@ -8,9 +8,9 @@ import requests
 from common.auth import build_auth_header
 from common.auth import login
 from common.auth import logout
-from common.utils import pretty_json
-from common.utils import print_err
 from common.utils import verify_response
+from v0.detail.parser import add_default_arguments
+from v0.detail.parser import verify_default_arguments
 
 
 def simple_changeset_to_list( data ):
@@ -58,21 +58,10 @@ def choose_project( archived_projects_map ):
 
 def main():
     parser = argparse.ArgumentParser( description='Export TimeTracker data.' )
-    parser.add_argument( '--api', metavar='URL', type=str, help='default: %(default)s',
-                         default='https://time.nevees.org/api' )
-    parser.add_argument( '-e', metavar='EMAIL', type=str, help='email or username must be given' )
-    parser.add_argument( '-u', metavar='USERNAME', type=str, help='email or username must be given' )
-    parser.add_argument( '-p', metavar='PASSWORD', type=str, help='if not given you get prompted' )
-    parser.add_argument( '-y', action='store_true', help='skip warning notice' )
+    add_default_arguments( parser, with_y=True )
+
     args = parser.parse_args()
-
-    if args.e is None and args.u is None:
-        print_err( 'You must give -e or -u.' )
-        sys.exit( 1 )
-
-    if args.e is not None and args.u is not None:
-        print_err( '-e and -u are mutually exclusive.' )
-        sys.exit( 1 )
+    verify_default_arguments( args )
 
     access_token, refresh_token, user_id = login( args.api, args.e, args.u, args.p )
     try:
@@ -84,7 +73,8 @@ def main():
         links_map = {id_: link for id_, link in map( lambda link: (link['id'], link), profile['gitlab_links'] )}
 
         archived_projects = list( filter( lambda project: project['is_archived'] == True, subject['gitlab_projects'] ) )
-        archived_projects_map = {id_: project for id_, project in map( lambda project: (project['id'], project), archived_projects )}
+        archived_projects_map = {id_: project for id_, project in
+                                 map( lambda project: (project['id'], project), archived_projects )}
         ids = sorted( archived_projects_map.keys() )
         print()
         if len( ids ) == 0:
@@ -92,7 +82,8 @@ def main():
             exit( 0 )
         print( 'Archived projects:' )
         for id_ in ids:
-            print( f"{id_}: {links_map[archived_projects_map[id_]['link_id']]['name']} (GitLab-FID: {archived_projects_map[id_]['project_fid']})" )
+            print(
+                f"{id_}: {links_map[archived_projects_map[id_]['link_id']]['name']} (GitLab-FID: {archived_projects_map[id_]['project_fid']})" )
         print()
         id_ = choose_project( archived_projects_map )
 
