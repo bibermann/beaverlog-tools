@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import collections
 import datetime
 import json
 import os
@@ -66,21 +65,21 @@ def fetch_data( url, token ):
     activities = fetch_activities( url, token )
     bar.next()
     bar.finish()
-    return collections.OrderedDict( [
-        ('users', users),
-        ('organizations', organizations),
-        ('subjects', subjects),
-        ('locations', locations),
-        ('activities', activities),
-    ] )
+    return {
+        'users': users,
+        'organizations': organizations,
+        'subjects': subjects,
+        'locations': locations,
+        'activities': activities,
+    }
 
 
 def export_data( url, token, filename, skip_warning, user_id ):
-    data = collections.OrderedDict( [
-        ('exported_on', date_to_string( datetime.datetime.utcnow() )),
-        ('user_id', user_id),
-        ('data', fetch_data( url, token ))
-    ] )
+    data = {
+        'exported_on': date_to_string( datetime.datetime.utcnow() ),
+        'user_id': user_id,
+        'data': fetch_data( url, token ),
+    }
 
     if os.path.exists( filename ) and not skip_warning:
         print( f'WARNING: {filename} already exists' )
