@@ -13,22 +13,13 @@ from common.auth import logout
 from common.utils import pretty_json
 from common.utils import print_err
 from common.utils import verify_response
+from v0.clear import clear_data
 from v0.detail.parser import add_default_arguments
 from v0.detail.parser import verify_default_arguments
 
 
 def simple_changeset_to_list( data ):
     return [x['data'] for x in data['changeset']]
-
-
-def clear_data( url, token, skip_warning ):
-    if not skip_warning:
-        print( f'WARNING: This will permanently delete all your data' )
-        print( f'         on {url}' )
-        input( 'Press Enter to continue' )
-    print( 'Removing data...' )
-    r = requests.delete( f'{url}/batch/all-private', headers=build_auth_header( token ) )
-    verify_response( r )
 
 
 def load_data( filename ):
