@@ -4,9 +4,9 @@ import sys
 
 import requests
 
-from common.auth import build_auth_header
-from common.utils import print_err
-from common.utils import verify_response
+from all.common.auth import build_auth_header
+from all.common.utils import print_err
+from all.common.utils import verify_response
 
 
 def login( url, email, username, password ):

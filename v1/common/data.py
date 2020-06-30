@@ -2,7 +2,7 @@ import json
 import os
 import sys
 
-from common.utils import print_err
+from all.common.utils import print_err
 from v1.detail.upgrade.v0 import upgrade_from_v0
 
 

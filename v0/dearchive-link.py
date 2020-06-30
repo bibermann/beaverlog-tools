@@ -5,11 +5,11 @@ import sys
 
 import requests
 
-from common.auth import build_auth_header
+from all.common.auth import build_auth_header
 from v0.common.auth import login
 from v0.common.auth import logout
-from common.utils import simple_changeset_to_list
-from common.utils import verify_response
+from all.common.utils import simple_changeset_to_list
+from all.common.utils import verify_response
 from v0.common.parser import add_default_arguments
 from v0.common.parser import verify_default_arguments
 
