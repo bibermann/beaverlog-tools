@@ -54,7 +54,7 @@ def import_files( url, token, filenames, dry_run ):
 
 
 def main():
-    parser = argparse.ArgumentParser( description='(Re)import time data.' )
+    parser = argparse.ArgumentParser( description='(Re)import Beaverlog data from CSV.' )
     add_default_arguments( parser, with_y=True )
     parser.add_argument( '--append', action='store_true', help='do not clear data before importing' )
     parser.add_argument( '--dry-run', action='store_true', help='useful to check input files for errors' )

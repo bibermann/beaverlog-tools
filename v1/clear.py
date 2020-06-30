@@ -11,7 +11,7 @@ from v1.common.parser import verify_default_arguments
 
 
 def main():
-    parser = argparse.ArgumentParser( description='(Re)import time data.' )
+    parser = argparse.ArgumentParser( description='Clear Beaverlog data.' )
     add_default_arguments( parser, with_y=True )
 
     args = parser.parse_args()

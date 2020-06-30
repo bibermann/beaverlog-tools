@@ -38,7 +38,7 @@ def choose_link( archived_links_map ):
 
 
 def main():
-    parser = argparse.ArgumentParser( description='Export TimeTracker data.' )
+    parser = argparse.ArgumentParser( description='De-archive a GitLab link reference.' )
     add_default_arguments( parser, with_y=True )
 
     args = parser.parse_args()

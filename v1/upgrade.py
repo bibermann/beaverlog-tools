@@ -8,7 +8,7 @@ from v1.common.data import save_data
 
 
 def main():
-    parser = argparse.ArgumentParser( description='Export TimeTracker data.' )
+    parser = argparse.ArgumentParser( description='Upgrade a Beaverlog data file.' )
     parser.add_argument( '-y', action='store_true', help='skip warning notice' )
     parser.add_argument( 'input', metavar='INPUT', type=str, help='source json file' )
     parser.add_argument( 'output', metavar='OUTPUT', type=str, help='target json file' )

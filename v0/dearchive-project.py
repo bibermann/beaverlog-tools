@@ -54,7 +54,7 @@ def choose_project( archived_projects_map ):
 
 
 def main():
-    parser = argparse.ArgumentParser( description='Export TimeTracker data.' )
+    parser = argparse.ArgumentParser( description='De-archive a GitLab project reference.' )
     add_default_arguments( parser, with_y=True )
 
     args = parser.parse_args()

@@ -162,7 +162,7 @@ def map_parent_ids( subjects, parent_id_map ):
 
 
 def main():
-    parser = argparse.ArgumentParser( description='(Re)import time data.' )
+    parser = argparse.ArgumentParser( description='(Re)import Beaverlog data.' )
     add_default_arguments( parser, with_y=True )
     parser.add_argument( '--parent-id-map', metavar='JSON', type=str, help='map for organization parent ids' )
     parser.add_argument( '--whitelist', metavar='JSON', type=str, help='array with subject names to allow' )

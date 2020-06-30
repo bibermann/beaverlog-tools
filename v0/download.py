@@ -86,7 +86,7 @@ def export_data( url, token, filename, skip_warning, user_id ):
 
 
 def main():
-    parser = argparse.ArgumentParser( description='Export TimeTracker data.' )
+    parser = argparse.ArgumentParser( description='Export Beaverlog data.' )
     add_default_arguments( parser, with_y=True )
     parser.add_argument( 'output', metavar='OUTPUT', type=str, help='target json file' )
 
