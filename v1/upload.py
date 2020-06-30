@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import copy
 import json
 import sys
 
@@ -8,25 +9,32 @@ import progress.bar
 import requests
 
 from common.auth import build_auth_header
-from v0.common.auth import login
-from v0.common.auth import logout
 from common.utils import pretty_json
 from common.utils import print_err
 from common.utils import simple_changeset_to_list
 from common.utils import verify_response
-from v0.common.clear import clear_data
-from v0.common.data import load_data
-from v0.common.parser import add_default_arguments
-from v0.common.parser import verify_default_arguments
+from v1.common.auth import login
+from v1.common.auth import logout
+from v1.common.clear import clear_data
+from v1.common.data import load_data
+from v1.common.ids import EMPTY_ID
+from v1.common.ids import get_id_data
+from v1.common.parser import add_default_arguments
+from v1.common.parser import verify_default_arguments
 
 
 def import_subject( url, token, subject, new_id_map ):
     data = {
-        'name': subject['name'],
-        'organization_id': 0,
-        'is_project': subject['is_project'],
+        **subject,
         'parent_ids': [new_id_map[parent_id] for parent_id in subject['parent_ids']],
     }
+    data.pop( 'id', None )
+    data.pop( 'created_on', None )
+    data.pop( 'activity_start', None )
+    data.pop( 'activity_end', None )
+    data.pop( 'activity_count', None )
+    data.pop( 'milliseconds', None )
+    data.pop( 'ancestor_ids', None )
     r = requests.post( f'{url}/subject/', json=data, headers=build_auth_header( token ) )
     verify_response( r, data )
     changes = simple_changeset_to_list( r.json() )
@@ -58,8 +66,9 @@ def verify_subject_ids_exist_on_server( url, token, subjects ):
 
 
 def import_subjects( url, token, subjects, subject_name_whitelist, subject_name_blacklist ):
-    private_subjects = [subject for subject in subjects if subject['organization_id'] == 0]
-    organization_subjects_map = {subject['id']: subject for subject in subjects if subject['organization_id'] != 0}
+    private_subjects = [subject for subject in subjects if subject['organization_id'] == EMPTY_ID]
+    organization_subjects_map = {subject['id']: subject for subject in subjects if
+                                 subject['organization_id'] != EMPTY_ID}
     used_organization_subject_ids = set()
     for subject in private_subjects:
         for parent_id in subject['parent_ids']:
@@ -100,9 +109,14 @@ def import_subjects( url, token, subjects, subject_name_whitelist, subject_name_
 
 def import_location( url, token, location ):
     data = {
-        'name': location['name'],
-        'coordinates': location['coordinates'],
+        **location,
     }
+    data.pop( 'id', None )
+    data.pop( 'created_on', None )
+    data.pop( 'activity_start', None )
+    data.pop( 'activity_end', None )
+    data.pop( 'activity_count', None )
+    data.pop( 'milliseconds', None )
     r = requests.post( f'{url}/location/', json=data, headers=build_auth_header( token ) )
     verify_response( r, data )
     changes = simple_changeset_to_list( r.json() )
@@ -120,22 +134,100 @@ def import_locations( url, token, locations ):
     return new_id_map
 
 
-def import_activity( url, token, activity, new_subject_id_map, new_location_id_map ):
+def import_tracker_link( url, token, tracker_link ):
     data = {
-        'subject_id': new_subject_id_map[activity['subject_id']],
-        'location_id': new_location_id_map[activity['location_id']],
-        'start': activity['start'],
-        'end': activity['end'],
-        'data': activity['data'],
+        **tracker_link,
     }
+    data.pop( 'id', None )
+    data.pop( 'created_on', None )
+    r = requests.post( f'{url}/tracker-link/', json=data, headers=build_auth_header( token ) )
+    verify_response( r, data )
+    changes = simple_changeset_to_list( r.json() )
+    assert len( changes ) == 1
+    return changes[0]['id']
+
+
+def import_tracker_links( url, token, tracker_links ):
+    new_id_map = {}
+    bar = progress.bar.Bar( f'Uploading...', max=len( tracker_links ) )
+    for tracker_link in tracker_links:
+        new_id_map[tracker_link['id']] = import_tracker_link( url, token, tracker_link )
+        bar.next()
+    bar.finish()
+    return new_id_map
+
+
+def import_tracker_project( url, token, tracker_project, new_tracker_link_id_map, new_subject_id_map ):
+    data = {
+        **tracker_project,
+        'link_id': new_tracker_link_id_map[tracker_project['link_id']],
+        'subject_id':
+            new_subject_id_map[tracker_project['subject_id']]
+            if 'subject_id' in tracker_project and tracker_project['subject_id'] != EMPTY_ID else EMPTY_ID,
+    }
+    data.pop( 'id', None )
+    data.pop( 'created_on', None )
+    r = requests.post( f'{url}/tracker-project/', json=data, headers=build_auth_header( token ) )
+    verify_response( r, data )
+    changes = simple_changeset_to_list( r.json() )
+    assert len( changes ) == 1
+    return changes[0]['id']
+
+
+def import_tracker_projects( url, token, tracker_projects, new_tracker_link_id_map, new_subject_id_map ):
+    new_id_map = {}
+    bar = progress.bar.Bar( f'Uploading...', max=len( tracker_projects ) )
+    for tracker_project in tracker_projects:
+        new_id_map[tracker_project['id']] = import_tracker_project( url, token, tracker_project,
+                                                                    new_tracker_link_id_map, new_subject_id_map )
+        bar.next()
+    bar.finish()
+    return new_id_map
+
+
+def import_tracker_issue( url, token, tracker_issue, new_tracker_project_id_map ):
+    data = {
+        **tracker_issue,
+        'project_id': new_tracker_project_id_map[tracker_issue['project_id']],
+    }
+    data.pop( 'id', None )
+    data.pop( 'created_on', None )
+    r = requests.post( f'{url}/tracker-issue/', json=data, headers=build_auth_header( token ) )
+    verify_response( r, data )
+    changes = simple_changeset_to_list( r.json() )
+    assert len( changes ) == 1
+    return changes[0]['id']
+
+
+def import_tracker_issues( url, token, tracker_issues, new_tracker_project_id_map ):
+    new_id_map = {}
+    bar = progress.bar.Bar( f'Uploading...', max=len( tracker_issues ) )
+    for tracker_issue in tracker_issues:
+        new_id_map[tracker_issue['id']] = import_tracker_issue( url, token, tracker_issue, new_tracker_project_id_map )
+        bar.next()
+    bar.finish()
+    return new_id_map
+
+
+def import_activity( url, token, activity, new_subject_id_map, new_location_id_map, new_tracker_issue_id_map ):
+    data = {
+        **activity,
+        'subject_ids': list( map( lambda sid: new_subject_id_map[sid], activity['subject_ids'] ) ),
+        'location_id': new_location_id_map[activity['location_id']],
+        'issue_id':
+            new_tracker_issue_id_map[activity['issue_id']]
+            if 'issue_id' in activity and activity['issue_id'] != EMPTY_ID else EMPTY_ID,
+    }
+    data.pop( 'id', None )
+    data.pop( 'created_on', None )
     r = requests.post( f'{url}/activity/', json=data, headers=build_auth_header( token ) )
     verify_response( r, data )
 
 
-def import_activities( url, token, activities, new_subject_id_map, new_location_id_map ):
+def import_activities( url, token, activities, new_subject_id_map, new_location_id_map, new_tracker_issue_id_map ):
     bar = progress.bar.Bar( f'Uploading...', max=len( activities ) )
     for activity in activities:
-        import_activity( url, token, activity, new_subject_id_map, new_location_id_map )
+        import_activity( url, token, activity, new_subject_id_map, new_location_id_map, new_tracker_issue_id_map )
         bar.next()
     bar.finish()
 
@@ -143,12 +235,30 @@ def import_activities( url, token, activities, new_subject_id_map, new_location_
 def import_json( url, token, data, subject_name_whitelist, subject_name_blacklist ):
     print( 'Importing subject data...' )
     new_subject_id_map = import_subjects( url, token, data['subjects'], subject_name_whitelist, subject_name_blacklist )
+
     print( 'Importing location data...' )
     new_location_id_map = import_locations( url, token, data['locations'] )
+
+    print( 'Importing tracker link data...' )
+    new_tracker_link_id_map = import_tracker_links( url, token, data['tracker_links'] )
+
+    print( 'Importing tracker project data...' )
+    new_tracker_project_id_map = import_tracker_projects( url, token, data['tracker_projects'],
+                                                          new_tracker_link_id_map, new_subject_id_map )
+
+    print( 'Importing tracker issue data...' )
+    new_tracker_issue_id_map = import_tracker_issues( url, token, data['tracker_issues'], new_tracker_project_id_map )
+
     print( 'Importing activity data...' )
+    activities = copy.deepcopy( data['activities'] )
+    for activity in activities:
+        activity['subject_ids'] = list( filter( lambda sid: sid in new_subject_id_map, activity['subject_ids'] ) )
+        if any( sid for sid in activity['subject_ids'] if
+                not 'kind' in new_subject_id_map[sid] or new_subject_id_map[sid]['kind'] != 'label' ):
+            activity['subject_ids'] = []
     import_activities( url, token,
-                       [activity for activity in data['activities'] if activity['subject_id'] in new_subject_id_map],
-                       new_subject_id_map, new_location_id_map )
+                       [activity for activity in data['activities'] if len( activity['subject_ids'] ) > 0],
+                       new_subject_id_map, new_location_id_map, new_tracker_issue_id_map )
 
 
 def map_parent_ids( subjects, parent_id_map ):
@@ -190,6 +300,7 @@ def main():
 
     access_token, refresh_token, _ = login( args.api, args.e, args.u, args.p )
     try:
+        id_offset, id_token = get_id_data( args.api, access_token )
         clear_data( args.api, access_token, args.y )
         data = load_data( args.input )
         if len( parent_id_map ) > 0:

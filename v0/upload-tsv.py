@@ -8,12 +8,12 @@ import progress.bar
 import requests
 
 from common.auth import build_auth_header
-from common.auth import login
-from common.auth import logout
+from v0.common.auth import login
+from v0.common.auth import logout
 from common.utils import verify_response
-from v0.clear import clear_data
-from v0.detail.parser import add_default_arguments
-from v0.detail.parser import verify_default_arguments
+from v0.common.clear import clear_data
+from v0.common.parser import add_default_arguments
+from v0.common.parser import verify_default_arguments
 
 
 def import_csv( url, token, reader, on_row_complete, dry_run ):

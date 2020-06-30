@@ -1,4 +1,0 @@
-progress
-pytz
-requests
-simplejson

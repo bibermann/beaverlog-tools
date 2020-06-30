@@ -35,3 +35,7 @@ def verify_response( r, data=None ):
         except simplejson.errors.JSONDecodeError:
             print_err( str( r.status_code ) + ':\n' + r.text )
         sys.exit( 1 )
+
+
+def simple_changeset_to_list( data ):
+    return [x['data'] for x in data['changeset']]

@@ -3,11 +3,11 @@
 import argparse
 import sys
 
-from v0.common.auth import login
-from v0.common.auth import logout
-from v0.common.clear import clear_data
-from v0.common.parser import add_default_arguments
-from v0.common.parser import verify_default_arguments
+from v1.common.auth import login
+from v1.common.auth import logout
+from v1.common.clear import clear_data
+from v1.common.parser import add_default_arguments
+from v1.common.parser import verify_default_arguments
 
 
 def main():

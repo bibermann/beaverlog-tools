@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "beaverlog-tools"
+version = "1.0.0"
+description = ""
+authors = ["Fabian Sandoval Saldias <fabianvss@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+simplejson = "^3.16.0"
+requests = "^2.22.0"
+hashids = "^1.2.0"
+pytz = "^2020.1"
+progress = "^1.5"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
