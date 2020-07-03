@@ -39,6 +39,6 @@ poetry run -- v0/download.py --help
 To migrate your data from [time.nevees.org](http://time.nevees.org) to [beaverlog.cc](https://beaverlog.cc), run:
 
 ```bash
-poetry run -- v0/download.py data.json -e YOUR_EMAIL
-poetry run -- v1/upload.py   data.json -e YOUR_EMAIL
+poetry run -- v0/download.py data-$(date --iso-8601).json -e YOUR_EMAIL
+poetry run -- v1/upload.py   data-$(date --iso-8601).json -e YOUR_EMAIL
 ```
