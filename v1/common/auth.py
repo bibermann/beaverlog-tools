@@ -7,9 +7,10 @@ import requests
 from all.common.auth import build_auth_header
 from all.common.utils import print_err
 from all.common.utils import verify_response
+from v1.common.remote import RemoteData
 
 
-def login( url, email, username, password ):
+def login( url, email, username, password ) -> RemoteData:
     if password is None:
         password = getpass.getpass()
     data = {
@@ -25,12 +26,14 @@ def login( url, email, username, password ):
         sys.exit( 1 )
     verify_response( r, data )
     payload = r.json()
-    return payload['access_token'], payload['refresh_token'], payload['id']
+    return RemoteData( url, payload['access_token'], payload['refresh_token'], payload['id'], None )
 
 
-def logout( url, access_token, refresh_token ):
+def logout( remote_data: RemoteData ):
     print( 'Signing out...' )
-    r = requests.delete( f'{url}/auth/revoke-access', headers=build_auth_header( access_token ) )
+    r = requests.delete( f'{remote_data.url}/auth/revoke-access',
+                         headers=build_auth_header( remote_data.access_token ) )
     verify_response( r )
-    r = requests.delete( f'{url}/auth/revoke-refresh', headers=build_auth_header( refresh_token ) )
+    r = requests.delete( f'{remote_data.url}/auth/revoke-refresh',
+                         headers=build_auth_header( remote_data.refresh_token ) )
     verify_response( r )

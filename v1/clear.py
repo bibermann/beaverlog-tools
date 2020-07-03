@@ -17,11 +17,11 @@ def main():
     args = parser.parse_args()
     verify_default_arguments( args )
 
-    access_token, refresh_token, _ = login( args.api, args.e, args.u, args.p )
+    remote_data = login( args.api, args.e, args.u, args.p )
     try:
-        clear_data( args.api, access_token, args.y )
+        clear_data( remote_data, args.y )
     finally:
-        logout( args.api, access_token, refresh_token )
+        logout( remote_data )
 
     print( 'Clear successful.' )
 
