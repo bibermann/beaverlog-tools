@@ -289,7 +289,9 @@ def import_json( remote_data: RemoteData, data, parent_id_map, subject_name_whit
     print( 'Importing activity data...' )
     for activity in data['activities']:
         for sid in activity['subject_ids']:
-            assert (remote_data.id_manager.has_id( 'subject', sid ))
+            if not remote_data.id_manager.has_id( 'subject', sid ):
+                print(f'sid missing: {sid}')
+                assert False
     import_activities( remote_data, data['activities'] )
 
 

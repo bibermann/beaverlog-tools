@@ -1,6 +1,9 @@
 import copy
+import typing
 
 import simplejson as json
+
+from v1.common.ids import EMPTY_ID
 
 next_issue_id = 1
 projects = {}
@@ -98,11 +101,51 @@ def _transform_locations( data ):
         item['id'] = str( item['id'] )
 
 
+def _get_activity_subject_id( sid, data,
+                              subject_map: typing.Dict[str, typing.Dict[str, any]],
+                              subject_replacement_map: typing.Dict[str, str] ):
+    sid = str( sid )
+    s = subject_map[sid]
+    is_organization_subject = s['organization_id'] != EMPTY_ID
+    if not is_organization_subject:
+        return sid
+    if sid in subject_replacement_map:
+        return subject_replacement_map[sid]
+
+    old_name = s['name']
+    organization_name = next(o['name'] for o in data['organizations'] if o['id'] == s['organization_id'])
+
+    # create child subject
+    s = copy.deepcopy( s )
+    s['organization_id'] = EMPTY_ID
+    s['parent_ids'] = [sid]
+    s['name'] += ' [private]'
+    s['id'] += '_child'
+    s.pop( 'ancestor_ids', None )
+    s.pop( 'activity_count', None )
+    s.pop( 'activity_start', None )
+    s.pop( 'activity_end', None )
+    s.pop( 'created_on', None )
+    s.pop( 'gitlab_projects', None )
+    s.pop( 'is_project', None )
+    data['subjects'].append( s )
+
+    new_id = s['id']
+    new_name = s['name']
+    subject_replacement_map[sid] = new_id
+    print( f'Note: Added subject "{new_name}" ({new_id}) as child of organization subject '
+           f'"{organization_name} :: {old_name}" ({sid}) to hold your activity/activities.' )
+    return s['id']
+
+
 def _transform_activities( data ):
+    subject_map = {s['id']: s for s in data['subjects']}
+    subject_replacement_map = {}
     for item in data['activities']:
         item['id'] = str( item['id'] )
         item['location_id'] = str( item['location_id'] )
-        item['subject_ids'] = [str( item['subject_id'] )]
+        item['subject_ids'] = [
+            _get_activity_subject_id( item['subject_id'], data, subject_map, subject_replacement_map )]
         del item['subject_id']
         if 'data' in item:
             if isinstance( item['data'], dict ):
