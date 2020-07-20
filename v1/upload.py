@@ -9,11 +9,11 @@ import progress.bar
 import requests
 import typing
 
-from all.common.auth import build_auth_header
-from all.common.utils import pretty_json
-from all.common.utils import print_err
-from all.common.utils import simple_changeset_to_list
-from all.common.utils import verify_response
+from shared.common.auth import build_auth_header
+from shared.common.utils import pretty_json
+from shared.common.utils import print_err
+from shared.common.utils import simple_changeset_to_list
+from shared.common.utils import verify_response
 from v1.common.auth import login
 from v1.common.auth import logout
 from v1.common.clear import clear_data

@@ -9,10 +9,10 @@ import sys
 import progress.bar
 import requests
 
-from all.common.auth import build_auth_header
-from all.common.utils import date_to_string
-from all.common.utils import simple_changeset_to_list
-from all.common.utils import verify_response
+from shared.common.auth import build_auth_header
+from shared.common.utils import date_to_string
+from shared.common.utils import simple_changeset_to_list
+from shared.common.utils import verify_response
 from v1.common.auth import login
 from v1.common.auth import logout
 from v1.common.parser import add_default_arguments

@@ -8,13 +8,13 @@ import sys
 import progress.bar
 import requests
 
-from all.common.auth import build_auth_header
+from shared.common.auth import build_auth_header
 from v0.common.auth import login
 from v0.common.auth import logout
-from all.common.utils import date_to_string
-from all.common.utils import simple_changeset_to_list
-from all.common.utils import string_to_date
-from all.common.utils import verify_response
+from shared.common.utils import date_to_string
+from shared.common.utils import simple_changeset_to_list
+from shared.common.utils import string_to_date
+from shared.common.utils import verify_response
 from v0.common.data import load_data
 from v0.common.parser import add_default_arguments
 from v0.common.parser import verify_default_arguments

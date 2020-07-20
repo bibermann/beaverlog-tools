@@ -4,18 +4,37 @@ In this repository you find various scripts for interacting with the beaverlog A
 
 ## Requirements
 
-Install [direnv](https://direnv.net/docs/installation.html), [pyenv](https://github.com/pyenv/pyenv#installation)
-and [poetry](https://python-poetry.org/docs/#installation).
+Install [poetry](https://python-poetry.org/docs/#installation):
 
-When entering the root directory of this repository, direnv will ask you to run `direnv allow`.
-This is necessary once to configure poetry.
+```bash
+# install:
+sudo apt install -y python3-venv
+curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+
+# or update:
+poetry self update
+```
+
+Install timetracker-tools locally (in a subfolder):
+
+```bash
+git clone https://git.nevees.org/fabianvss/timetracker-tools.git
+cd timetracker-tools
+
+source .envrc  # poetry configuration (mandatory if you have not installed direnv)
+pyenv install --skip-existing  # optional (may remove some warnings; requires pyenv)
+
+rm -rf .venv
+poetry install
+rm -rf beaverlog_tools.egg-info
+```
 
 ## Usage
 
 Run the python scripts as follows:
 
 ```bash
-poetry run -- COMMAND
+poetry run COMMAND
 ```
 
 ### API v1 ([beaverlog.cc](https://beaverlog.cc/api/swagger-ui))
@@ -23,7 +42,7 @@ poetry run -- COMMAND
 Use the scripts in the `v1` directory, f.ex.:
 
 ```bash
-poetry run -- v1/upload.py --help
+poetry run v1/upload.py --help
 ```
 
 ### API v0 ([time.nevees.org](http://time.nevees.org/api/swagger-ui))
@@ -31,7 +50,7 @@ poetry run -- v1/upload.py --help
 Use the scripts in the `v0` directory, f.ex.:
 
 ```bash
-poetry run -- v0/download.py --help
+poetry run v0/download.py --help
 ```
 
 ## Example
@@ -39,6 +58,6 @@ poetry run -- v0/download.py --help
 To migrate your data from [time.nevees.org](http://time.nevees.org) to [beaverlog.cc](https://beaverlog.cc), run:
 
 ```bash
-poetry run -- v0/download.py data-$(date --iso-8601).json -e YOUR_EMAIL
-poetry run -- v1/upload.py   data-$(date --iso-8601).json -e YOUR_EMAIL
+poetry run v0/download.py data-$(date --iso-8601).json -e YOUR_EMAIL
+poetry run v1/upload.py   data-$(date --iso-8601).json -e YOUR_EMAIL
 ```

@@ -7,13 +7,13 @@ import sys
 import progress.bar
 import requests
 
-from all.common.auth import build_auth_header
+from shared.common.auth import build_auth_header
 from v0.common.auth import login
 from v0.common.auth import logout
-from all.common.utils import pretty_json
-from all.common.utils import print_err
-from all.common.utils import simple_changeset_to_list
-from all.common.utils import verify_response
+from shared.common.utils import pretty_json
+from shared.common.utils import print_err
+from shared.common.utils import simple_changeset_to_list
+from shared.common.utils import verify_response
 from v0.common.clear import clear_data
 from v0.common.data import load_data
 from v0.common.parser import add_default_arguments

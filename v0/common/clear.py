@@ -1,7 +1,7 @@
 import requests
 
-from all.common.auth import build_auth_header
-from all.common.utils import verify_response
+from shared.common.auth import build_auth_header
+from shared.common.utils import verify_response
 
 
 def clear_data( url, token, skip_warning ):

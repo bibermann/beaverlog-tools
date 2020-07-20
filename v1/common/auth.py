@@ -4,9 +4,9 @@ import sys
 
 import requests
 
-from all.common.auth import build_auth_header
-from all.common.utils import print_err
-from all.common.utils import verify_response
+from shared.common.auth import build_auth_header
+from shared.common.utils import print_err
+from shared.common.utils import verify_response
 from v1.common.remote import RemoteData
 
 

@@ -4,8 +4,12 @@ version = "1.0.0"
 description = ""
 authors = ["Fabian Sandoval Saldias <fabianvss@gmail.com>"]
 
+packages = [
+    {include = "shared"},
+]
+
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8.2"
 
 simplejson = "^3.16.0"
 requests = "^2.22.0"

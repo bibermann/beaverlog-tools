@@ -2,7 +2,7 @@
 
 import sys
 
-from all.common.utils import print_err
+from shared.common.utils import print_err
 
 
 def add_default_arguments( parser, with_y=False ):
