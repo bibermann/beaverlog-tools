@@ -9,12 +9,9 @@ next_issue_id = 1
 projects = {}
 
 
-def _add_issue( project_id, issue, data ):
+def _add_issue_raw( project_id, issue_fid, is_hidden, data ):
     global next_issue_id
     global projects
-
-    issue_fid = issue['issue_fid']
-    is_archived = issue['is_archived']
 
     if not project_id in projects:
         projects[project_id] = {}
@@ -27,13 +24,20 @@ def _add_issue( project_id, issue, data ):
         'project_id': project_id,
         'key': str( issue_fid ),
         'title': str( issue_fid ),
-        'is_hidden': is_archived,
+        'is_hidden': is_hidden,
         'was_used': True,
     } )
     next_issue_id += 1
 
 
-def _get_issue_id( project_id, issue_fid ):
+def _add_issue( project_id, issue, data ):
+    _add_issue_raw( project_id, issue['issue_fid'], issue['is_archived'], data )
+
+
+def _get_issue_id( project_id, issue_fid, data ):
+    if project_id not in projects or issue_fid not in projects[project_id]:
+        # inconsistency in data (should not happen, but does) -> just create the missing issue
+        _add_issue_raw( project_id, issue_fid, False, data )
     return projects[project_id][issue_fid]
 
 
@@ -151,7 +155,8 @@ def _transform_activities( data ):
             if isinstance( item['data'], dict ):
                 if 'issue' in item['data']:
                     item['issue_id'] = str( _get_issue_id( str( item['data']['issue']['project_id'] ),
-                                                           item['data']['issue']['issue_fid'] ) )
+                                                           item['data']['issue']['issue_fid'],
+                                                           data ) )
                     del item['data']['issue']
             elif isinstance( item['data'], str ):
                 try:
