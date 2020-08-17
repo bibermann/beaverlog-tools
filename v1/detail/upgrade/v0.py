@@ -96,7 +96,11 @@ def _transform_subjects( data ):
             if not 'tracker_projects' in data:
                 data['tracker_projects'] = []
             data['tracker_projects'].extend(
-                map( lambda p: _convert_project( p, item['id'], data ), item['gitlab_projects'] ) )
+                map(
+                    lambda p: _convert_project( p, item['id'], data ),
+                    [p for p in item['gitlab_projects'] if not (p['is_archived'] == True and len( p['issues'] ) == 0)]
+                )
+            )
             del item['gitlab_projects']
 
 
@@ -117,7 +121,7 @@ def _get_activity_subject_id( sid, data,
         return subject_replacement_map[sid]
 
     old_name = s['name']
-    organization_name = next(o['name'] for o in data['organizations'] if o['id'] == s['organization_id'])
+    organization_name = next( o['name'] for o in data['organizations'] if o['id'] == s['organization_id'] )
 
     # create child subject
     s = copy.deepcopy( s )
