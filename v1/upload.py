@@ -270,29 +270,39 @@ def import_activities( remote_data: RemoteData, activities ):
 
 
 def import_json( remote_data: RemoteData, data, parent_id_map, subject_name_whitelist, subject_name_blacklist ):
-    print( 'Importing subject data...' )
-    import_subjects( remote_data, data['subjects'], data['organizations'], parent_id_map, subject_name_whitelist,
-                     subject_name_blacklist )
+    if 'subjects' in data:
+        print( 'Importing subject data...' )
+        import_subjects( remote_data,
+                         data['subjects'],
+                         data['organizations'] if 'organizations' in data else [],
+                         parent_id_map,
+                         subject_name_whitelist,
+                         subject_name_blacklist )
 
-    print( 'Importing location data...' )
-    import_locations( remote_data, data['locations'] )
+    if 'locations' in data:
+        print( 'Importing location data...' )
+        import_locations( remote_data, data['locations'] )
 
-    print( 'Importing tracker link data...' )
-    import_tracker_links( remote_data, data['tracker_links'] )
+    if 'tracker_links' in data:
+        print( 'Importing tracker link data...' )
+        import_tracker_links( remote_data, data['tracker_links'] )
 
-    print( 'Importing tracker project data...' )
-    import_tracker_projects( remote_data, data['tracker_projects'] )
+    if 'tracker_projects' in data:
+        print( 'Importing tracker project data...' )
+        import_tracker_projects( remote_data, data['tracker_projects'] )
 
-    print( 'Importing tracker issue data...' )
-    import_tracker_issues( remote_data, data['tracker_issues'] )
+    if 'tracker_issues' in data:
+        print( 'Importing tracker issue data...' )
+        import_tracker_issues( remote_data, data['tracker_issues'] )
 
-    print( 'Importing activity data...' )
-    for activity in data['activities']:
-        for sid in activity['subject_ids']:
-            if not remote_data.id_manager.has_id( 'subject', sid ):
-                print(f'sid missing: {sid}')
-                assert False
-    import_activities( remote_data, data['activities'] )
+    if 'activities' in data:
+        print( 'Importing activity data...' )
+        for activity in data['activities']:
+            for sid in activity['subject_ids']:
+                if not remote_data.id_manager.has_id( 'subject', sid ):
+                    print(f'sid missing: {sid}')
+                    assert False
+        import_activities( remote_data, data['activities'] )
 
 
 def map_parent_ids( subjects, parent_id_map ):
