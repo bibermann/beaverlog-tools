@@ -15,11 +15,11 @@ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poet
 poetry self update
 ```
 
-Install timetracker-tools locally (in a subfolder):
+Install beaverlog-tools locally (in a subfolder):
 
 ```bash
-git clone https://git.nevees.org/fabianvss/timetracker-tools.git
-cd timetracker-tools
+git clone https://github.com/bibermann/beaverlog-tools.git
+cd beaverlog-tools
 
 source .envrc  # poetry configuration (mandatory if you have not installed direnv)
 pyenv install --skip-existing  # optional (may remove some warnings; requires pyenv)
