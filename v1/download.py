@@ -9,7 +9,7 @@ import sys
 import progress.bar
 import requests
 
-from shared.common.auth import build_auth_header
+from shared.common.auth import request_kwargs
 from shared.common.utils import date_to_string
 from shared.common.utils import simple_changeset_to_list
 from shared.common.utils import verify_response
@@ -20,55 +20,55 @@ from v1.common.parser import verify_default_arguments
 
 
 def fetch_users( remote_data ):
-    r = requests.get( f'{remote_data.url}/user/', headers=build_auth_header( remote_data.access_token ) )
+    r = requests.get( f'{remote_data.url}/user/', **request_kwargs( remote_data.access_token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
 
 def fetch_subjects( remote_data ):
-    r = requests.get( f'{remote_data.url}/subject/', headers=build_auth_header( remote_data.access_token ) )
+    r = requests.get( f'{remote_data.url}/subject/', **request_kwargs( remote_data.access_token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
 
 def fetch_locations( remote_data ):
-    r = requests.get( f'{remote_data.url}/location/', headers=build_auth_header( remote_data.access_token ) )
+    r = requests.get( f'{remote_data.url}/location/', **request_kwargs( remote_data.access_token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
 
 def fetch_activities( remote_data ):
-    r = requests.get( f'{remote_data.url}/activity/', headers=build_auth_header( remote_data.access_token ) )
+    r = requests.get( f'{remote_data.url}/activity/', **request_kwargs( remote_data.access_token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
 
 def fetch_organizations( remote_data ):
-    r = requests.get( f'{remote_data.url}/organization/', headers=build_auth_header( remote_data.access_token ) )
+    r = requests.get( f'{remote_data.url}/organization/', **request_kwargs( remote_data.access_token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
 
 def fetch_tracker_links( remote_data ):
-    r = requests.get( f'{remote_data.url}/tracker-link/', headers=build_auth_header( remote_data.access_token ) )
+    r = requests.get( f'{remote_data.url}/tracker-link/', **request_kwargs( remote_data.access_token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
 
 def fetch_tracker_projects( remote_data ):
-    r = requests.get( f'{remote_data.url}/tracker-project/', headers=build_auth_header( remote_data.access_token ) )
+    r = requests.get( f'{remote_data.url}/tracker-project/', **request_kwargs( remote_data.access_token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
 
 def fetch_tracker_issues( remote_data ):
-    r = requests.get( f'{remote_data.url}/tracker-issue/', headers=build_auth_header( remote_data.access_token ) )
+    r = requests.get( f'{remote_data.url}/tracker-issue/', **request_kwargs( remote_data.access_token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
 
 def fetch_reports( remote_data ):
-    r = requests.get( f'{remote_data.url}/report/', headers=build_auth_header( remote_data.access_token ) )
+    r = requests.get( f'{remote_data.url}/report/', **request_kwargs( remote_data.access_token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 

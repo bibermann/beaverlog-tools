@@ -4,8 +4,8 @@ import sys
 
 import requests
 
-from shared.common.auth import build_auth_header
-from shared.common.utils import print_err
+from shared.common.auth import explain_first_request_exception
+from shared.common.auth import request_kwargs
 from shared.common.utils import verify_response
 
 
@@ -19,9 +19,9 @@ def login( url, email, username, password ):
 
     print( 'Authenticating...' )
     try:
-        r = requests.post( f'{url}/auth/login', json=data )
-    except requests.exceptions.ConnectionError:
-        print_err( 'Server is down.' )
+        r = requests.post( f'{url}/auth/login', json=data, **request_kwargs() )
+    except Exception as e:
+        explain_first_request_exception(e)
         sys.exit( 1 )
     verify_response( r, data )
     payload = r.json()['data']
@@ -30,7 +30,7 @@ def login( url, email, username, password ):
 
 def logout( url, access_token, refresh_token ):
     print( 'Signing out...' )
-    r = requests.delete( f'{url}/auth/revoke-access', headers=build_auth_header( access_token ) )
+    r = requests.delete( f'{url}/auth/revoke-access', **request_kwargs( access_token ) )
     verify_response( r )
-    r = requests.delete( f'{url}/auth/revoke-refresh', headers=build_auth_header( refresh_token ) )
+    r = requests.delete( f'{url}/auth/revoke-refresh', **request_kwargs( refresh_token ) )
     verify_response( r )

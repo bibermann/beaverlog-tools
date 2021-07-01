@@ -9,7 +9,7 @@ import progress.bar
 import requests
 import typing
 
-from shared.common.auth import build_auth_header
+from shared.common.auth import request_kwargs
 from shared.common.utils import pretty_json
 from shared.common.utils import print_err
 from shared.common.utils import simple_changeset_to_list
@@ -36,14 +36,14 @@ def import_subject( remote_data: RemoteData, subject ):
     data.pop( 'activity_count', None )
     data.pop( 'milliseconds', None )
     data.pop( 'ancestor_ids', None )
-    r = requests.post( f'{remote_data.url}/subject/', json=data, headers=build_auth_header( remote_data.access_token ) )
+    r = requests.post( f'{remote_data.url}/subject/', json=data, **request_kwargs( remote_data.access_token ) )
     verify_response( r, data )
     changes = simple_changeset_to_list( r.json() )
     assert len( changes ) == 1
 
 
 def check_subject_id_exists_on_server( remote_data: RemoteData, subject_id ):
-    r = requests.get( f'{remote_data.url}/subject/{subject_id}', headers=build_auth_header( remote_data.access_token ) )
+    r = requests.get( f'{remote_data.url}/subject/{subject_id}', **request_kwargs( remote_data.access_token ) )
     if not (200 <= r.status_code < 300):
         return False
     return True
@@ -158,7 +158,7 @@ def import_location( remote_data: RemoteData, location ):
     data.pop( 'activity_count', None )
     data.pop( 'milliseconds', None )
     r = requests.post( f'{remote_data.url}/location/', json=data,
-                       headers=build_auth_header( remote_data.access_token ) )
+                       **request_kwargs( remote_data.access_token ) )
     verify_response( r, data )
     changes = simple_changeset_to_list( r.json() )
     assert len( changes ) == 1
@@ -180,7 +180,7 @@ def import_tracker_link( remote_data: RemoteData, tracker_link ):
     }
     data.pop( 'created_on', None )
     r = requests.post( f'{remote_data.url}/tracker-link/', json=data,
-                       headers=build_auth_header( remote_data.access_token ) )
+                       **request_kwargs( remote_data.access_token ) )
     verify_response( r, data )
     changes = simple_changeset_to_list( r.json() )
     assert len( changes ) == 1
@@ -206,7 +206,7 @@ def import_tracker_project( remote_data: RemoteData, tracker_project ):
     }
     data.pop( 'created_on', None )
     r = requests.post( f'{remote_data.url}/tracker-project/', json=data,
-                       headers=build_auth_header( remote_data.access_token ) )
+                       **request_kwargs( remote_data.access_token ) )
     verify_response( r, data )
     changes = simple_changeset_to_list( r.json() )
     assert len( changes ) == 1
@@ -229,7 +229,7 @@ def import_tracker_issue( remote_data: RemoteData, tracker_issue ):
     }
     data.pop( 'created_on', None )
     r = requests.post( f'{remote_data.url}/tracker-issue/', json=data,
-                       headers=build_auth_header( remote_data.access_token ) )
+                       **request_kwargs( remote_data.access_token ) )
     verify_response( r, data )
     changes = simple_changeset_to_list( r.json() )
     assert len( changes ) == 1
@@ -257,7 +257,7 @@ def import_activity( remote_data: RemoteData, activity ):
     }
     data.pop( 'created_on', None )
     r = requests.post( f'{remote_data.url}/activity/', json=data,
-                       headers=build_auth_header( remote_data.access_token ) )
+                       **request_kwargs( remote_data.access_token ) )
     verify_response( r, data )
 
 

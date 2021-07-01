@@ -8,7 +8,7 @@ import sys
 import progress.bar
 import requests
 
-from shared.common.auth import build_auth_header
+from shared.common.auth import request_kwargs
 from v0.common.auth import login
 from v0.common.auth import logout
 from shared.common.utils import date_to_string
@@ -30,7 +30,7 @@ class Alignment( enum.Enum ):
 
 
 def fetch_activities( url, token ):
-    r = requests.get( f'{url}/activity/', headers=build_auth_header( token ) )
+    r = requests.get( f'{url}/activity/', **request_kwargs( token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
@@ -45,7 +45,7 @@ def filter_activity_data_by_subject( data, subject_id ):
 
 
 def delete_activity_data( url, token, activity_id ):
-    r = requests.delete( f'{url}/activity/{activity_id}', headers=build_auth_header( token ) )
+    r = requests.delete( f'{url}/activity/{activity_id}', **request_kwargs( token ) )
     verify_response( r )
 
 
@@ -115,7 +115,7 @@ def calc_daily_summarized_times( data, subject_ids, alignment: Alignment ):
 
 
 def import_activity( url, token, data ):
-    r = requests.post( f'{url}/activity/', json=data, headers=build_auth_header( token ) )
+    r = requests.post( f'{url}/activity/', json=data, **request_kwargs( token ) )
     verify_response( r, data )
 
 

@@ -9,7 +9,7 @@ import sys
 import progress.bar
 import requests
 
-from shared.common.auth import build_auth_header
+from shared.common.auth import request_kwargs
 from shared.common.utils import date_to_string
 from shared.common.utils import simple_changeset_to_list
 from shared.common.utils import verify_response
@@ -20,31 +20,31 @@ from v0.common.parser import verify_default_arguments
 
 
 def fetch_users( url, token ):
-    r = requests.get( f'{url}/user/all', headers=build_auth_header( token ) )
+    r = requests.get( f'{url}/user/all', **request_kwargs( token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
 
 def fetch_organizations( url, token ):
-    r = requests.get( f'{url}/organization/', headers=build_auth_header( token ) )
+    r = requests.get( f'{url}/organization/', **request_kwargs( token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
 
 def fetch_subjects( url, token ):
-    r = requests.get( f'{url}/subject/', headers=build_auth_header( token ) )
+    r = requests.get( f'{url}/subject/', **request_kwargs( token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
 
 def fetch_locations( url, token ):
-    r = requests.get( f'{url}/location/', headers=build_auth_header( token ) )
+    r = requests.get( f'{url}/location/', **request_kwargs( token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 
 
 def fetch_activities( url, token ):
-    r = requests.get( f'{url}/activity/', headers=build_auth_header( token ) )
+    r = requests.get( f'{url}/activity/', **request_kwargs( token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )
 

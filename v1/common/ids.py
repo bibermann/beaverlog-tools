@@ -3,7 +3,7 @@ import uuid
 import requests
 from hashids import Hashids
 
-from shared.common.auth import build_auth_header
+from shared.common.auth import request_kwargs
 from shared.common.utils import verify_response
 
 EMPTY_ID = '0'
@@ -41,7 +41,7 @@ def next_id( id_ ):
 
 def get_id_data( url, access_token ):
     print( 'Fetching ID data...' )
-    r = requests.post( f'{url}/id/', headers=build_auth_header( access_token ) )
+    r = requests.post( f'{url}/id/', **request_kwargs( access_token ) )
     verify_response( r )
     payload = r.json()
     return payload['id_offset'], payload['id_token']

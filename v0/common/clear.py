@@ -1,6 +1,6 @@
 import requests
 
-from shared.common.auth import build_auth_header
+from shared.common.auth import request_kwargs
 from shared.common.utils import verify_response
 
 
@@ -10,5 +10,5 @@ def clear_data( url, token, skip_warning ):
         print( f'         on {url}' )
         input( 'Press Enter to continue' )
     print( 'Removing data...' )
-    r = requests.delete( f'{url}/batch/all-private', headers=build_auth_header( token ) )
+    r = requests.delete( f'{url}/batch/all-private', **request_kwargs( token ) )
     verify_response( r )

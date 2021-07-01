@@ -5,7 +5,7 @@ import sys
 
 import requests
 
-from shared.common.auth import build_auth_header
+from shared.common.auth import request_kwargs
 from v0.common.auth import login
 from v0.common.auth import logout
 from shared.common.utils import simple_changeset_to_list
@@ -15,19 +15,19 @@ from v0.common.parser import verify_default_arguments
 
 
 def fetch_profile( url, token, user_id ):
-    r = requests.get( f'{url}/user/{user_id}', headers=build_auth_header( token ) )
+    r = requests.get( f'{url}/user/{user_id}', **request_kwargs( token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )[0]
 
 
 def fetch_subject( url, token, subject_id ):
-    r = requests.get( f'{url}/subject/{subject_id}', headers=build_auth_header( token ) )
+    r = requests.get( f'{url}/subject/{subject_id}', **request_kwargs( token ) )
     verify_response( r )
     return simple_changeset_to_list( r.json() )[0]
 
 
 def update_subject( url, token, subject_id, data ):
-    r = requests.put( f'{url}/subject/{subject_id}', json=data, headers=build_auth_header( token ) )
+    r = requests.put( f'{url}/subject/{subject_id}', json=data, **request_kwargs( token ) )
     verify_response( r )
 
 

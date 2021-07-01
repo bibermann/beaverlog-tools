@@ -7,7 +7,7 @@ import sys
 import progress.bar
 import requests
 
-from shared.common.auth import build_auth_header
+from shared.common.auth import request_kwargs
 from v0.common.auth import login
 from v0.common.auth import logout
 from shared.common.utils import pretty_json
@@ -27,7 +27,7 @@ def import_subject( url, token, subject, new_id_map ):
         'is_project': subject['is_project'],
         'parent_ids': [new_id_map[parent_id] for parent_id in subject['parent_ids']],
     }
-    r = requests.post( f'{url}/subject/', json=data, headers=build_auth_header( token ) )
+    r = requests.post( f'{url}/subject/', json=data, **request_kwargs( token ) )
     verify_response( r, data )
     changes = simple_changeset_to_list( r.json() )
     assert len( changes ) == 1
@@ -35,7 +35,7 @@ def import_subject( url, token, subject, new_id_map ):
 
 
 def check_subject_id_exists_on_server( url, token, subject_id ):
-    r = requests.get( f'{url}/subject/{subject_id}', headers=build_auth_header( token ) )
+    r = requests.get( f'{url}/subject/{subject_id}', **request_kwargs( token ) )
     if not (200 <= r.status_code < 300):
         return False
     return True
@@ -103,7 +103,7 @@ def import_location( url, token, location ):
         'name': location['name'],
         'coordinates': location['coordinates'],
     }
-    r = requests.post( f'{url}/location/', json=data, headers=build_auth_header( token ) )
+    r = requests.post( f'{url}/location/', json=data, **request_kwargs( token ) )
     verify_response( r, data )
     changes = simple_changeset_to_list( r.json() )
     assert len( changes ) == 1
@@ -128,7 +128,7 @@ def import_activity( url, token, activity, new_subject_id_map, new_location_id_m
         'end': activity['end'],
         'data': activity['data'],
     }
-    r = requests.post( f'{url}/activity/', json=data, headers=build_auth_header( token ) )
+    r = requests.post( f'{url}/activity/', json=data, **request_kwargs( token ) )
     verify_response( r, data )
 
 

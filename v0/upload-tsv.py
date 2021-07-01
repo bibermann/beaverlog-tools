@@ -7,7 +7,7 @@ import sys
 import progress.bar
 import requests
 
-from shared.common.auth import build_auth_header
+from shared.common.auth import request_kwargs
 from v0.common.auth import login
 from v0.common.auth import logout
 from shared.common.utils import verify_response
@@ -35,7 +35,7 @@ def import_csv( url, token, reader, on_row_complete, dry_run ):
             **({'data': {"comment": row[5]}} if len( row ) > 5 and row[5] != '' else {})
         }
         if not dry_run:
-            r = requests.post( f'{url}/activity/', json=data, headers=build_auth_header( token ) )
+            r = requests.post( f'{url}/activity/', json=data, **request_kwargs( token ) )
             verify_response( r, data )
         on_row_complete()
 
